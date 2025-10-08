@@ -1,1 +1,1 @@
-# chrome-pomodoro-timer
+# Chrome Pomodoro Timer
