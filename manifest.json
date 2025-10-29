@@ -1,10 +1,10 @@
 {
-  "name": "Hello Extensions of the world!",
-  "description": "Base Level Extension",
+  "name": "Chrome Pomodoro Timer",
+  "description": "A simple Pomodoro timer extension for Google Chrome.",
   "version": "1.0",
   "manifest_version": 3,
   "action": {
-    "default_popup": "hello.html",
-    "default_icon": "hello_extensions.png"
+    "default_popup": "src/popup/index.html",
+    "default_icon": "public/hello_extensions.png"
   }
 }
