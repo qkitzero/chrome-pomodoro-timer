@@ -1,0 +1,10 @@
+{
+  "name": "Chrome Pomodoro Timer",
+  "description": "A simple Pomodoro timer extension for Google Chrome.",
+  "version": "1.0",
+  "manifest_version": 3,
+  "action": {
+    "default_popup": "src/popup/index.html",
+    "default_icon": "public/hello_extensions.png"
+  }
+}
