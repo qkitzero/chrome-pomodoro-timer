@@ -2,32 +2,48 @@ import { useState, useEffect } from "react";
 
 export const Popup = () => {
   const [time, setTime] = useState(25 * 60);
-  const [isActive, setIsActive] = useState(false);
+  const [isRunning, setIsRunning] = useState(false);
 
   useEffect(() => {
-    let interval: number | undefined;
+    chrome.storage.local.get(["timeLeft", "isRunning"], (res) => {
+      setTime(res.timeLeft ?? 25 * 60);
+      setIsRunning(res.isRunning ?? false);
+    });
 
-    if (isActive && time > 0) {
-      interval = setInterval(() => {
-        setTime((time) => time - 1);
-      }, 1000);
-    } else if (!isActive && time !== 0) {
-      clearInterval(interval);
-    } else if (time === 0) {
-      clearInterval(interval);
-      alert("Time's up!");
-    }
+    const storageListener = (changes: {
+      [key: string]: chrome.storage.StorageChange;
+    }) => {
+      if (changes.timeLeft) {
+        setTime(changes.timeLeft.newValue);
+      }
+      if (changes.isRunning) {
+        setIsRunning(changes.isRunning.newValue);
+      }
+    };
 
-    return () => clearInterval(interval);
-  }, [isActive, time]);
+    chrome.storage.onChanged.addListener(storageListener);
+
+    return () => {
+      chrome.storage.onChanged.removeListener(storageListener);
+    };
+  }, []);
 
   const toggle = () => {
-    setIsActive(!isActive);
+    const command = !isRunning ? "start" : "pause";
+    chrome.runtime.sendMessage({ command }, (res) => {
+      if (res) {
+        setIsRunning(res.isRunning);
+      }
+    });
   };
 
   const reset = () => {
-    setTime(25 * 60);
-    setIsActive(false);
+    chrome.runtime.sendMessage({ command: "reset" }, (res) => {
+      if (res) {
+        setTime(res.timeLeft);
+        setIsRunning(res.isRunning);
+      }
+    });
   };
 
   const formatTime = (time: number) => {
@@ -47,7 +63,7 @@ export const Popup = () => {
           onClick={toggle}
           className="bg-blue-500 text-white font-bold py-2 px-4 rounded mx-2"
         >
-          {isActive ? "Pause" : "Start"}
+          {isRunning ? "Pause" : "Start"}
         </button>
         <button
           onClick={reset}
