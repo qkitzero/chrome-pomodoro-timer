@@ -55,10 +55,13 @@ export const Popup = () => {
   };
 
   return (
-    <div className="w-50 text-center p-4">
-      <div className="text-2xl font-bold">Pomodoro Timer</div>
-      <div className="text-3xl my-4">{formatTime(time)}</div>
-      <div className="flex">
+    <div className="w-80 text-center p-4">
+      <div className="flex items-center justify-center text-2xl font-bold">
+        Pomodoro Timer
+        <img src="/icon32.png" className="ml-2" />
+      </div>
+      <div className="text-4xl my-4">{formatTime(time)}</div>
+      <div className="flex justify-center">
         <button
           onClick={toggle}
           className="bg-blue-500 text-white font-bold py-2 px-4 rounded mx-2"

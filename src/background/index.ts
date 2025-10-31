@@ -16,6 +16,13 @@ chrome.alarms.onAlarm.addListener((alarm) => {
         let timeLeft = res.timeLeft - 1;
         if (timeLeft <= 0) {
           chrome.storage.local.set({ isRunning: false, timeLeft: 0 });
+          chrome.notifications.create({
+            type: "basic",
+            iconUrl: "icon128.png",
+            title: "Time is up!",
+            message: "Your pomodoro session has ended.",
+            priority: 2,
+          });
         } else {
           chrome.storage.local.set({ timeLeft });
         }
