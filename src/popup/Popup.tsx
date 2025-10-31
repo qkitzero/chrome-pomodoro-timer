@@ -1,49 +1,17 @@
-import { useState, useEffect } from "react";
+import { useChromeStorage } from "./useChromeStorage";
+import { POMODORO_TIME } from "../background/timer";
 
 export const Popup = () => {
-  const [time, setTime] = useState(25 * 60);
-  const [isRunning, setIsRunning] = useState(false);
-
-  useEffect(() => {
-    chrome.storage.local.get(["timeLeft", "isRunning"], (res) => {
-      setTime(res.timeLeft ?? 25 * 60);
-      setIsRunning(res.isRunning ?? false);
-    });
-
-    const storageListener = (changes: {
-      [key: string]: chrome.storage.StorageChange;
-    }) => {
-      if (changes.timeLeft) {
-        setTime(changes.timeLeft.newValue);
-      }
-      if (changes.isRunning) {
-        setIsRunning(changes.isRunning.newValue);
-      }
-    };
-
-    chrome.storage.onChanged.addListener(storageListener);
-
-    return () => {
-      chrome.storage.onChanged.removeListener(storageListener);
-    };
-  }, []);
+  const [time, setTime] = useChromeStorage("timeLeft", POMODORO_TIME);
+  const [isRunning, setIsRunning] = useChromeStorage("isRunning", false);
 
   const toggle = () => {
     const command = !isRunning ? "start" : "pause";
-    chrome.runtime.sendMessage({ command }, (res) => {
-      if (res) {
-        setIsRunning(res.isRunning);
-      }
-    });
+    chrome.runtime.sendMessage({ command });
   };
 
   const reset = () => {
-    chrome.runtime.sendMessage({ command: "reset" }, (res) => {
-      if (res) {
-        setTime(res.timeLeft);
-        setIsRunning(res.isRunning);
-      }
-    });
+    chrome.runtime.sendMessage({ command: "reset" });
   };
 
   const formatTime = (time: number) => {
@@ -55,10 +23,13 @@ export const Popup = () => {
   };
 
   return (
-    <div className="w-50 text-center p-4">
-      <div className="text-2xl font-bold">Pomodoro Timer</div>
-      <div className="text-3xl my-4">{formatTime(time)}</div>
-      <div className="flex">
+    <div className="w-80 text-center p-4">
+      <div className="flex items-center justify-center text-2xl font-bold">
+        Pomodoro Timer
+        <img src="/icon32.png" className="ml-2" />
+      </div>
+      <div className="text-4xl my-4">{formatTime(time)}</div>
+      <div className="flex justify-center">
         <button
           onClick={toggle}
           className="bg-blue-500 text-white font-bold py-2 px-4 rounded mx-2"
